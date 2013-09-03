@@ -65,7 +65,12 @@ $(function() {
 			}
 		}
 		$('#useGeoLocation').click(getGeoLocation);
-	};
+	}
+	else {
+		typeAlert = ' alert-error';
+		message = 'Seu navegador não suporta geolocalização :(';
+		$('#alerts').html('<div class="alert'+typeAlert+'">'+message+'</div>');
+	}
 });</script>
 </body>
 </html>
