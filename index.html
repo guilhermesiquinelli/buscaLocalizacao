@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Busca Localização</title>
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+	<script type="text/javascript" src="assets/js/jquery-2.0.3.min.js"></script>
+</head>
+<body>
+<div class="container">
+	<header>
+		<div class="page-header">
+			<h1>Busca localização <small>Usa HTML5 GeoLocation, Google Maps API e Jquery</small></h1>
+		</div>
+	</header>
+	<main>
+		<div class="row">
+			<div class="span12">
+				<h2>Resultado</h2>
+				<div id="alerts"></div>
+				<div id="buttons"></div>
+				<h3 id="results"></h3>
+			</div>
+		</div>
+	</main>
+</div>
+<script type="text/javascript">
+$(function() {
+	if (navigator.geolocation) {
+		typeAlert = ' alert-success';
+		message = 'Seu navegador suporta geolocalização, clique no botão "Buscar localização"';
+		$('#alerts').html('<div class="alert'+typeAlert+'">'+message+'</div>');
+		$('#buttons').html('<button id="useGeoLocation" class="btn btn-primary">Buscar localização</button>');
+
+		var getGeoLocation = function() {
+			navigator.geolocation.getCurrentPosition(success, error);
+
+			function error(e) {
+				switch (e.code) {
+					case 1: typeAlert = ''; message = 'Você não permitiu o compartilhamento da sua localização :/'; break;
+					case 2: typeAlert = ' alert-error'; message = 'O navegador não conseguiu determinar sua posição :/'; break;
+					case 3: typeAlert = ' alert-error'; message = 'Tempo limite excedido :/'; break;
+				}
+				$('#alerts').html('<div class="alert'+typeAlert+'">'+message+'</div>');
+			}
+			function success(pos) {
+				googleMapsWebServiceUrl = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='+pos.coords.latitude+','+pos.coords.longitude+'&region=br&sensor=false';
+
+				$.ajax({
+					dataType: "json",
+					type: 'GET',
+					cache: false,
+					url: googleMapsWebServiceUrl,
+					success: function(data)
+					{
+						console.log(data.results);
+						result = {
+							"cidade" : data.results[0].address_components[2].long_name,
+							"estado" : data.results[0].address_components[3].long_name,
+							"pais" : data.results[0].address_components[4].long_name
+						}
+						$('#results').html(result.cidade+', '+result.estado+', '+result.pais);
+					}
+				});
+			}
+		}
+		$('#useGeoLocation').click(getGeoLocation);
+	};
+});</script>
+</body>
+</html>
